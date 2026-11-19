@@ -31,7 +31,7 @@ They can run side by side with separate credentials: for example, a desktop Clau
 ```bash
 python3 -m venv ~/.local/share/alphamobile-agent
 ~/.local/share/alphamobile-agent/bin/pip install \
-  "git+https://github.com/xak1234/alphaMobile.git#subdirectory=adapters/agent-bridge"
+  https://github.com/xak1234/alphaMobile/releases/download/v0.3.0/alphamobile_agent-0.3.0-py3-none-any.whl
 alphamobile --config ~/.local/share/alphamobile/config.json agent Claude \
   --url https://YOUR-BOX.YOUR-TAILNET.ts.net \
   --output ~/.config/alphamobile/claude-agent.connection.json
