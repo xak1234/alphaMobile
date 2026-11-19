@@ -24,13 +24,15 @@ An optional `[voice]` backend lets calls use a faster model than text chats. Rep
 
 ## Install
 
-Python 3.11+ on the machine that will run the agent. This can be the relay host.
+Python 3.11+ on the machine that will run the agent. This can be the relay host. Install the wheel from the [0.3.0 release](https://github.com/xak1234/alphaMobile/releases/tag/v0.3.0):
 
 ```bash
 python3 -m venv ~/.local/share/alphamobile-agent
 ~/.local/share/alphamobile-agent/bin/pip install \
-  "git+https://github.com/xak1234/alphaMobile.git#subdirectory=adapters/agent-bridge"
+  https://github.com/xak1234/alphaMobile/releases/download/v0.3.0/alphamobile_agent-0.3.0-py3-none-any.whl
 ```
+
+From a checkout, `pip install ./adapters/agent-bridge` installs the same package.
 
 Provision a dedicated agent credential on the relay host. The name is what the phone shows ("Checking with Claude"):
 

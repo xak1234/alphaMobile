@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-11-19
 
 - New optional always-on agent bridge, `alphamobile-agent` (`adapters/agent-bridge`). It keeps an agent online and answers phone messages, call questions and callback requests without a desktop session, using an OpenAI-compatible endpoint (local or hosted) or a CLI agent such as `claude -p`, with an optional faster backend for voice calls. Includes example configurations, a systemd user unit, and tests against the real relay.
 - Documentation explains when to use the always-on bridge, the stdio bridge or direct HTTP.
 - CI lints, type-checks, tests and builds the new package.
+
+### Compatibility
+
+Only the new `alphamobile-agent` 0.3.0 package is new. The Android app (0.2.0, version code 10, same signed APK), relay (`alphamobile` 0.2.0) and stdio bridge (`alphamobile_mcp` 0.2.0) are unchanged and are re-published with this release as-is. No relay upgrade is needed to use the agent bridge.
 
 ## 0.2.0 — 2026-11-19
 

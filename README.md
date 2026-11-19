@@ -8,7 +8,7 @@ Connect the agents you already run to your own relay. alphaMobile is free, open-
 
 [Install](docs/INSTALL.md) · [Agent setup](docs/MCP.md) · [Always-on agent](adapters/agent-bridge/README.md) · [Build Android](docs/BUILD.md) · [Architecture](docs/ARCHITECTURE.md) · [Updates and backup](docs/OPERATIONS.md) · [Security](SECURITY.md)
 
-Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
+Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. Release **0.3.0** adds the optional [always-on agent bridge](adapters/agent-bridge/README.md); the app, relay and stdio bridge are unchanged. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
 
 <table align="center" width="100%">
   <tr>
