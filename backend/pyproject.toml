@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alphamobile"
+version = "0.2.0"
+description = "Private MCP-to-mobile conversations with local voice AI"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+dependencies = ["fastapi==0.141.1", "uvicorn==0.52.1", "mcp==1.29.0", "httpx==0.28.1", "pydantic==2.13.4", "tzdata>=2025.2; sys_platform == 'win32'"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.14,<1", "mypy>=1.18,<2"]
+
+[project.scripts]
+alphamobile = "alphamobile.cli:main"
+alphamobile-updates = "alphamobile.updates:main"
+
+[tool.setuptools.packages.find]
+include = ["alphamobile*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends"]

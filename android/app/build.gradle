@@ -1,0 +1,65 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'org.alphamobile.app'
+    compileSdk 36
+    buildToolsVersion '35.0.0'
+    defaultConfig {
+        applicationId 'org.alphamobile.app'
+        minSdk 26
+        targetSdk 36
+        versionCode providers.gradleProperty('alphaVersionCode').getOrElse('10').toInteger()
+        versionName providers.gradleProperty('alphaVersionName').getOrElse('0.2.0')
+        testInstrumentationRunner 'org.alphamobile.app.SmokeInstrumentation'
+        def endpoint = providers.gradleProperty('alphaBackendUrl').getOrElse('')
+        buildConfigField 'String', 'DEFAULT_BACKEND', '"' + endpoint.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        manifestPlaceholders = [alphaNetworkConfig: providers.gradleProperty('alphaCaFile').isPresent() ? '@xml/deployment_network_security_config' : '@xml/network_security_config']
+        ndk { abiFilters(*providers.gradleProperty('alphaAbis').getOrElse('arm64-v8a,x86_64').split(',')) }
+    }
+    buildFeatures { buildConfig true }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    packaging { jniLibs { useLegacyPackaging = true; keepDebugSymbols += ['**/libalpha_server.so'] } }
+    buildTypes { release { minifyEnabled false } }
+    lint { abortOnError true; checkReleaseBuilds true; disable 'AndroidGradlePluginVersion', 'GradleDependency' }
+}
+dependencies {
+    if (providers.gradleProperty('alphaLocalModel').getOrElse('false').toBoolean()) implementation project(':local-model')
+    implementation 'androidx.core:core:1.17.0'
+    implementation 'com.alphacephei:vosk-android:0.3.75'
+}
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation'] }
+
+if (providers.gradleProperty('alphaCaFile').isPresent()) {
+    def generated = layout.buildDirectory.dir('generated/box-trust')
+    android.sourceSets.main.res.srcDir(generated)
+    def task = tasks.register('prepareBoxTrust') {
+        inputs.file(providers.gradleProperty('alphaCaFile'))
+        inputs.property('endpoint', providers.gradleProperty('alphaBackendUrl'))
+        outputs.dir(generated)
+        doLast {
+            def root = generated.get().asFile
+            new File(root, 'raw').mkdirs()
+            new File(root, 'xml').mkdirs()
+            new File(root, 'raw/box_ca.pem').bytes = file(providers.gradleProperty('alphaCaFile').get()).bytes
+            def host = new URI(providers.gradleProperty('alphaBackendUrl').get()).host
+            if (host == null || !(host ==~ /[a-zA-Z0-9.-]+/)) throw new GradleException('Invalid backend hostname')
+            new File(root, 'xml/deployment_network_security_config.xml').text = """<network-security-config>
+              <base-config cleartextTrafficPermitted="false"/>
+              <domain-config cleartextTrafficPermitted="false"><domain includeSubdomains="false">${host}</domain><trust-anchors><certificates src="@raw/box_ca"/></trust-anchors></domain-config>
+              <domain-config cleartextTrafficPermitted="true"><domain includeSubdomains="false">127.0.0.1</domain><domain includeSubdomains="false">localhost</domain><trust-anchors><certificates src="@raw/box_ca"/><certificates src="system"/></trust-anchors></domain-config>
+            </network-security-config>"""
+        }
+    }
+    tasks.named('preBuild').configure { dependsOn(task) }
+}
+
+// The standard app requires the actual offline speech model; GGUF inference is optional.
+tasks.register('validateRuntimeAssets') {
+    doLast {
+        ['am/final.mdl', 'conf/model.conf', 'graph/HCLr.fst', 'uuid'].each { relative ->
+            if (!file('src/main/assets/model-en-us/' + relative).isFile())
+                throw new GradleException('Run python scripts/prepare-speech.py from the repository root first')
+        }
+
+    }
+}
+tasks.named('preBuild').configure { dependsOn('validateRuntimeAssets') }

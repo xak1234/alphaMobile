@@ -1,0 +1,18 @@
+plugins { id 'com.android.library' }
+android {
+    namespace 'org.alphamobile.localmodel'
+    compileSdk 36
+    defaultConfig { minSdk 26 }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    packaging { jniLibs { keepDebugSymbols += ['**/libalpha_server.so'] } }
+    lint { abortOnError true; disable 'AndroidGradlePluginVersion', 'GradleDependency' }
+}
+tasks.register('validateNativeAssets') {
+    doLast {
+        providers.gradleProperty('alphaAbis').getOrElse('arm64-v8a,x86_64').split(',').each { abi ->
+            if (!file('src/main/jniLibs/' + abi + '/libalpha_server.so').isFile())
+                throw new GradleException('Run python scripts/build-native.py --abis ' + abi)
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn('validateNativeAssets') }

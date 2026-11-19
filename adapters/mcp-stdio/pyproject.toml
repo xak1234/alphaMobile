@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alphamobile-mcp"
+version = "0.2.0"
+description = "Standalone stdio MCP bridge for alphaMobile"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+dependencies = ["mcp==1.29.0", "httpx==0.28.1"]
+
+[project.scripts]
+alphamobile-mcp = "alphamobile_mcp.bridge:main"
+
+[tool.setuptools.packages.find]
+include = ["alphamobile_mcp*"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
