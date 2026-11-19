@@ -10,9 +10,20 @@ Connect the agents you already run to your own relay. alphaMobile is free, open-
 
 Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
 
-| Home | Calls | Agents |
-| :---: | :---: | :---: |
-| [<img src="docs/screenshots/home.png" width="200" alt="alphaMobile Midnight blue command centre with Calls, Messages, Tasks and Agents">](docs/screenshots/home.png) | [<img src="docs/screenshots/calls.png" width="200" alt="Expandable recent calls with agent, date, time and subject">](docs/screenshots/calls.png) | [<img src="docs/screenshots/agents.png" width="200" alt="Connected agents and callback actions; private hostname replaced for publication">](docs/screenshots/agents.png) |
+<table align="center" width="100%">
+  <tr>
+    <th align="center" width="25%">Home</th>
+    <th align="center" width="25%">Calls</th>
+    <th align="center" width="25%">Agents</th>
+    <th align="center" width="25%">Incoming call</th>
+  </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screenshots/home.png"><img src="docs/screenshots/home.png" width="170" alt="alphaMobile Midnight blue command centre with Calls, Messages, Tasks and Agents"></a></td>
+    <td align="center" width="25%"><a href="docs/screenshots/calls.png"><img src="docs/screenshots/calls.png" width="170" alt="Expandable recent calls with agent, date, time and subject"></a></td>
+    <td align="center" width="25%"><a href="docs/screenshots/agents.png"><img src="docs/screenshots/agents.png" width="170" alt="Connected agents and callback actions; private hostname replaced for publication"></a></td>
+    <td align="center" width="25%"><a href="docs/screenshots/incoming-call.png"><img src="docs/screenshots/incoming-call.png" width="170" alt="Incoming Claude agent call with notification and Answer and Decline actions"></a></td>
+  </tr>
+</table>
 
 Click a screenshot to view it full size.
 
