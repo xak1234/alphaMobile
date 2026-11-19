@@ -1,0 +1,16 @@
+# Hosted OpenAI-compatible API (DeepSeek shown). The key is read from the environment
+# variable named in api_key_env; put it in the service's EnvironmentFile, never in this file.
+name = "DeepSeek"
+connection = "~/.config/alphamobile/deepseek-agent.connection.json"
+
+[text]
+type = "openai"
+base_url = "https://api.deepseek.com/v1"
+model = "deepseek-chat"
+api_key_env = "DEEPSEEK_API_KEY"
+
+# Optional: a smaller local model for faster spoken answers.
+# [voice]
+# type = "openai"
+# base_url = "http://127.0.0.1:8080/v1"
+# model = "gemma"

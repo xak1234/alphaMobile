@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- New optional always-on agent bridge, `alphamobile-agent` (`adapters/agent-bridge`). It keeps an agent online and answers phone messages, call questions and callback requests without a desktop session, using an OpenAI-compatible endpoint (local or hosted) or a CLI agent such as `claude -p`, with an optional faster backend for voice calls. Includes example configurations, a systemd user unit, and tests against the real relay.
+- Documentation explains when to use the always-on bridge, the stdio bridge or direct HTTP.
+- CI lints, type-checks, tests and builds the new package.
+
 ## 0.2.0 — 2026-11-19
 
 First generic public distribution under MIT, based on the 0.1.8 application.

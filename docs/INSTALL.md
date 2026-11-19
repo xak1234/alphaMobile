@@ -4,7 +4,7 @@
 
 - An Android 8+ ARM64 or x86_64 device. Nothing Phone (2a) motivated the original design; other handsets require their own voice/background-permission checks.
 - A relay host with Python 3.11+, a few hundred MB of disk, and a stable private network connection. No GPU or model is needed by the relay.
-- An MCP-capable agent/client you control. A connected but inactive model cannot answer calls or messages.
+- An MCP-capable agent/client you control, or a model endpoint/CLI agent for the optional always-on agent bridge. A connected but inactive model cannot answer calls or messages.
 - HTTPS connectivity from phone and agent to the relay. Tailscale on all relevant computers/devices is the documented path; another private network and trusted TLS proxy also works.
 
 The supplied APK bundles an English speech recognizer. Android supplies text-to-speech; install an offline English voice in Android's TTS settings if necessary. No audio recordings are uploaded by alphaMobile; recognized text is sent to the agent.
@@ -112,6 +112,8 @@ Quiet mode suppresses alerts. Android volume, silent mode and Do Not Disturb sti
 
 Follow [MCP.md](MCP.md) to generate a private agent connection file and configure either Streamable HTTP or the independent stdio bridge. Different agents should have separate credentials. `list_devices` identifies your paired phone; call it only when you intend to test ringing.
 
+For replies at any hour without a desktop session open, install the [always-on agent bridge](../adapters/agent-bridge/README.md) on the relay or another always-on computer and point it at a local model, a hosted OpenAI-compatible API or a CLI agent such as `claude -p`.
+
 Schedule/results display does not grant access to an agent's internal scheduler. The scheduling agent must publish its actual schedules and actual run results through the provided MCP tools.
 
 ## Troubleshooting
@@ -122,7 +124,7 @@ Schedule/results display does not grant access to an agent's internal scheduler.
 | Pairing rejected | Same state/config file as the service, correct keyword, expiry and whether it was already consumed |
 | TLS failure | Correct HTTPS hostname, public CA, correct device clock; rebuild for an intentionally private CA |
 | MCP invalid host | Actual HTTPS hostname appears in `config.json` `allowed_hosts`, then restart the relay |
-| Agent linked but no reply/callback | The agent must poll and answer; a transport connection alone does not run a model |
+| Agent linked but no reply/callback | The agent must poll and answer; a transport connection alone does not run a model. Use the always-on agent bridge, and check `journalctl --user -u alphamobile-agent` |
 | No ringing | Availability, Quiet mode, channel sound, notification/full-screen permissions, Android battery/DND controls |
 | Tasks empty or stale | Agent's actual task source and reporting loop; see task-sync tools in MCP.md |
 | Update not offered | Published higher version code on your paired relay; valid APK metadata and same certificate |

@@ -5,6 +5,7 @@
 | Android app | Pairing, availability, ringing, Vosk transcription, Android TTS, message/task history and updates | Device-authenticated HTTPS `/api/*` |
 | Python relay | Durable SQLite data, credentials, call state, questions/answers, task reports, update files | FastAPI REST and Streamable HTTP `/mcp` |
 | Stdio bridge | Connect a desktop MCP client to a remote relay and maintain presence | MCP stdio in; authenticated HTTPS out |
+| Always-on agent bridge (optional) | Keep an agent online and answer messages, call questions and callbacks from a configured model endpoint or CLI | Authenticated HTTPS/MCP out; OpenAI-compatible HTTP or subprocess to the model |
 | Agent | Model reasoning, tools, answers, real schedule inventory/results | Fourteen MCP tools |
 | Optional local-model library | Developer API for a pinned on-phone llama.cpp CPU process | App-private model plus authenticated loopback HTTP |
 
@@ -12,7 +13,7 @@ The standard app and relay do not load a generative model. Agents own reasoning 
 
 An agent rings a paired available device. The phone reads the supplied question, transcribes the user and persists that question to the relay. It says it is checking with the agent and waits. The agent reads pending questions, uses its own context/tools, then sends an answer or sentence chunks. Every real answer is also saved for Messages. A callback is a durable request that an active agent must consume; it cannot launch a closed desktop client.
 
-The Android foreground service keeps availability/ringing alive while Android permits it. Foreground pages refresh at five-second intervals; call long-poll requests return early on new data. The stdio bridge heartbeats every ten seconds; presence expires after 35 seconds. These are presence and transport mechanisms, not a scheduler or autonomous agent worker.
+The Android foreground service keeps availability/ringing alive while Android permits it. Foreground pages refresh at five-second intervals; call long-poll requests return early on new data. The stdio and always-on bridges heartbeat every ten seconds; presence expires after 35 seconds. The relay and stdio bridge are presence and transport mechanisms, not a scheduler or autonomous worker. The optional always-on bridge is a worker that runs outside the relay: it answers phone-initiated questions using the model or command you configure, and it never invents task schedules.
 
 ## Persistence and boundaries
 
@@ -40,4 +41,4 @@ The stdio bridge uses a different private JSON file with `url`, `token` and opti
 
 ## Extension points
 
-Add an MCP-capable agent without changing Android. Publish external scheduler records using stable task/run IDs without modifying the database schema. Use the existing stdio adapter or direct Streamable HTTP according to client support. The GGUF module is optional and has no automatic route into agent calls; integrations must explicitly supply context and decide when to invoke it.
+Add an MCP-capable agent without changing Android. Publish external scheduler records using stable task/run IDs without modifying the database schema. Use the existing stdio adapter or direct Streamable HTTP according to client support, or the always-on bridge for an agent that should answer without a desktop session. The GGUF module is optional and has no automatic route into agent calls; integrations must explicitly supply context and decide when to invoke it.

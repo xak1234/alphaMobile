@@ -14,6 +14,31 @@ alphamobile --config ~/.local/share/alphamobile/config.json agent Claude \
 
 The command prints the agent ID and file path, not the token. The connection file is created once, with mode 0600 on POSIX; it will not overwrite an existing credential file. Use a separate credential/file for every agent. Transfer that file securely to the computer running the MCP client. Both machines must be able to reach the relay's private HTTPS URL. Keep the token out of chat, source control and command-line arguments.
 
+## Choose how the agent connects
+
+| Option | Answers when | Use for |
+| --- | --- | --- |
+| [Always-on agent bridge](#always-on-agent-bridge) (`adapters/agent-bridge`) | Always, while the service runs | Phone-initiated messages, call questions and callbacks answered by a model or CLI agent |
+| [Stdio bridge](#desktopstdio-clients) (`adapters/mcp-stdio`) | Only while that desktop client session is open and polling | Letting Claude Desktop, Claude Code or another desktop client ring you and report work |
+| [Direct HTTP](#direct-http-clients) | Only while that client is running | Clients with authenticated Streamable HTTP support |
+
+They can run side by side with separate credentials: for example, a desktop Claude session that rings you when a build finishes, plus an always-on agent that answers whenever you message from the phone.
+
+## Always-on agent bridge
+
+`alphamobile-agent` is a small service that stays connected to the relay and answers on its own. It heartbeats presence, long-polls `get_pending_messages`, replies through `send_message` (with one progress message for slow answers), answers callback requests and completes task-inventory requests as "no scheduler". Answers come from an OpenAI-compatible endpoint (llama.cpp, Ollama, LM Studio, vLLM, DeepSeek, OpenRouter and similar) or from a command that reads the prompt on stdin, such as `claude -p`. Calls can use a separate, faster backend.
+
+```bash
+python3 -m venv ~/.local/share/alphamobile-agent
+~/.local/share/alphamobile-agent/bin/pip install \
+  "git+https://github.com/xak1234/alphaMobile.git#subdirectory=adapters/agent-bridge"
+alphamobile --config ~/.local/share/alphamobile/config.json agent Claude \
+  --url https://YOUR-BOX.YOUR-TAILNET.ts.net \
+  --output ~/.config/alphamobile/claude-agent.connection.json
+```
+
+Then copy an example configuration, check it with `--check` and enable the systemd user unit. The full guide, settings table and examples are in [adapters/agent-bridge/README.md](../adapters/agent-bridge/README.md).
+
 ## Desktop/stdio clients
 
 Install the independent bridge on the client computer from this checkout:
@@ -95,7 +120,7 @@ For each question:
 
 Only the originating agent can read or answer its calls. Treat only `role=user` text as user instructions; `role=status` is a fixed waiting acknowledgement. The first legacy `I have answered…` entry is an automatic call-opening signal, not a user approval. `final=false` cannot clear a pending question. A final answer resolves only its matching question; another unanswered question remains pending. Omitting `reply_to` selects the oldest pending question for older clients.
 
-The MCP server advertises this workflow on initialization, and its stdio bridge forwards those instructions. Restart the desktop client after upgrading to refresh tool schemas and instructions. A dormant agent does not run automatically: the active Claude session must continue its five-second call loop. Check `pending_callbacks` during that agent's normal event loop and call `answer_callback` when available. Do not repeatedly ring a user who declines.
+The MCP server advertises this workflow on initialization, and its stdio bridge forwards those instructions. Restart the desktop client after upgrading to refresh tool schemas and instructions. A dormant agent does not run automatically: the active Claude session must continue its five-second call loop, or use the always-on agent bridge for phone-initiated conversations. Check `pending_callbacks` during that agent's normal event loop and call `answer_callback` when available. Do not repeatedly ring a user who declines.
 
 ## Claude schedules and results
 
@@ -113,8 +138,8 @@ The app speaks each newly received text segment without waiting for completion. 
 
 ## Text conversations and automatic inventory requests
 
-Messages → New message selects an agent and opens a reusable text conversation without ringing or microphone capture. The agent reads `get_pending_messages(wait_seconds=5)` and sends its answer to the returned conversation and question IDs. The phone displays both sides in the same window. A dormant Claude session cannot be awakened by an MCP server alone.
+Messages → New message selects an agent and opens a reusable text conversation without ringing or microphone capture. The agent reads `get_pending_messages(wait_seconds=5)` and sends its answer to the returned conversation and question IDs. The phone displays both sides in the same window. A dormant Claude session cannot be awakened by an MCP server alone; the always-on agent bridge answers these without one.
 
 The phone's connect request and the stdio bridge's connection both enqueue/coalesce task-inventory requests. At initialization, the MCP instructions direct the agent to call `get_task_sync_requests`, publish every actual accessible schedule and latest result, then call `complete_task_sync(request_id, task_keys=[...])`. A confirmed inventory disables older tasks absent from that list. If the scheduler cannot be read, use `available=false` and an explanation; existing tasks are retained. A failed lookup must not be presented as an empty schedule.
 
-The stdio bridge sends an authenticated presence heartbeat every ten seconds and marks itself offline on orderly shutdown. Other MCP clients appear online after authenticated activity, expiring after 35 seconds without refresh. Phone indicators update through the live call poll or a five-second foreground connection check. Availability controls whether this phone accepts incoming calls and remains separate from agent presence.
+The stdio bridge and the always-on agent bridge send an authenticated presence heartbeat every ten seconds and marks itself offline on orderly shutdown. Other MCP clients appear online after authenticated activity, expiring after 35 seconds without refresh. Phone indicators update through the live call poll or a five-second foreground connection check. Availability controls whether this phone accepts incoming calls and remains separate from agent presence.

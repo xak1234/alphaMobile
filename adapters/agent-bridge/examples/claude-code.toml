@@ -1,0 +1,22 @@
+# Always-on Claude: answers through the Claude Code CLI on this machine.
+# Sign in once with `claude setup-token` (or set CLAUDE_CODE_OAUTH_TOKEN / ANTHROPIC_API_KEY
+# in the service environment). The prompt is written to the command's stdin.
+name = "Claude"
+connection = "~/.config/alphamobile/claude-agent.connection.json"
+instructions = """
+Answer from what you know. Say so plainly when you cannot check something."""
+
+[text]
+type = "command"
+argv = ["claude", "-p", "--model", "sonnet", "--max-turns", "8"]
+timeout = 300
+
+# Voice calls need a fast answer: no tools, one turn.
+[voice]
+type = "command"
+argv = ["claude", "-p", "--model", "sonnet", "--tools", "", "--max-turns", "1"]
+timeout = 60
+
+[behaviour]
+progress_after = 15
+progress_text = "Still working on that."
