@@ -2,6 +2,10 @@
 
 **A private Android phone interface for your AI agents — calls, messages and scheduled-task results over MCP, without a telephone provider.**
 
+**No alphaMobile sign-up. No membership or subscription. No separate AI or telephone API account or key required.**
+
+Connect the agents you already run to your own relay. alphaMobile is free, open-source software with no registration service, paid tiers or membership checks.
+
 [Install](docs/INSTALL.md) · [Agent setup](docs/MCP.md) · [Build Android](docs/BUILD.md) · [Architecture](docs/ARCHITECTURE.md) · [Updates and backup](docs/OPERATIONS.md) · [Security](SECURITY.md)
 
 Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
@@ -42,6 +46,8 @@ Screenshots supplied by the project author; the Agents image has been edited to 
 | Private-network HTTPS | Tailscale Serve or your reverse proxy | Relay host | Yes for a real phone |
 
 No GPU is required on the relay. Your agent uses its own model and tools. The optional GGUF library is a developer component; it does not answer agent calls and has no standalone-assistant UI.
+
+Your existing agent or chosen networking service may have its own account requirements. The optional Tailscale setup below uses a Tailscale account; alphaMobile itself does not require one, and you can use your own private HTTPS network instead.
 
 ## Quick start
 
