@@ -10,15 +10,11 @@ Connect the agents you already run to your own relay. alphaMobile is free, open-
 
 Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
 
-<p align="center"><img src="docs/screenshots/home.png" width="360" alt="alphaMobile Midnight blue command centre with Calls, Messages, Tasks and Agents"></p>
+| Home | Calls | Agents |
+| :---: | :---: | :---: |
+| [<img src="docs/screenshots/home.png" width="200" alt="alphaMobile Midnight blue command centre with Calls, Messages, Tasks and Agents">](docs/screenshots/home.png) | [<img src="docs/screenshots/calls.png" width="200" alt="Expandable recent calls with agent, date, time and subject">](docs/screenshots/calls.png) | [<img src="docs/screenshots/agents.png" width="200" alt="Connected agents and callback actions; private hostname replaced for publication">](docs/screenshots/agents.png) |
 
-<details>
-<summary>More screenshots: recent calls and connected agents</summary>
-<p align="center">
-<img src="docs/screenshots/calls.png" width="300" alt="Expandable recent calls with agent, date, time and subject">
-<img src="docs/screenshots/agents.png" width="300" alt="Connected agents and callback actions; private hostname replaced for publication">
-</p>
-</details>
+Click a screenshot to view it full size.
 
 Screenshots supplied by the project author; the Agents image has been edited to replace its private hostname.
 
