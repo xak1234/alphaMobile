@@ -213,7 +213,8 @@ def main() -> None:
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s")
-    logging.getLogger("httpx").setLevel(logging.WARNING)
+    for noisy in ("httpx", "mcp"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     try:
         config = load_config(args.config)
     except ConfigError as error:
