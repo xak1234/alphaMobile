@@ -1,0 +1,17 @@
+# systemd user unit: ~/.config/systemd/user/alphamobile-agent.service
+# Then: systemctl --user daemon-reload && systemctl --user enable --now alphamobile-agent
+#       loginctl enable-linger "$USER"   # keep running after logout
+[Unit]
+Description=alphaMobile always-on agent bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=%h/.local/share/alphamobile-agent/bin/alphamobile-agent --config %h/.config/alphamobile/agent.toml
+# Optional private environment (API keys, CLAUDE_CODE_OAUTH_TOKEN). chmod 600.
+EnvironmentFile=-%h/.config/alphamobile/agent.env
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

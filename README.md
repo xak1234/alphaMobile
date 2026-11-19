@@ -6,7 +6,7 @@
 
 Connect the agents you already run to your own relay. alphaMobile is free, open-source software with no registration service, paid tiers or membership checks.
 
-[Install](docs/INSTALL.md) · [Agent setup](docs/MCP.md) · [Build Android](docs/BUILD.md) · [Architecture](docs/ARCHITECTURE.md) · [Updates and backup](docs/OPERATIONS.md) · [Security](SECURITY.md)
+[Install](docs/INSTALL.md) · [Agent setup](docs/MCP.md) · [Always-on agent](adapters/agent-bridge/README.md) · [Build Android](docs/BUILD.md) · [Architecture](docs/ARCHITECTURE.md) · [Updates and backup](docs/OPERATIONS.md) · [Security](SECURITY.md)
 
 Version **0.2.0** is the first generic public package, built from the tested 0.1.8 interface. The project is MIT licensed. Each user runs their own relay and connects their own agents; no shared hosted service, provider API key or model is included.
 
@@ -40,7 +40,7 @@ Screenshots supplied by the project author; the Agents image has been edited to 
 - Keyword pairing; the phone manages its generated credential automatically.
 - Operator-published app updates over the paired HTTPS connection, with hash and signing-certificate checks.
 
-**An agent must be active to answer.** The phone acknowledges a question and waits for that agent's real answer. The relay does not run Claude, wake a dormant desktop chat or invent task results. Schedules and run results appear when a connected agent reports them.
+**An agent must be running to answer.** The phone acknowledges a question and waits for that agent's real answer. The relay itself does not run a model, wake a dormant desktop chat or invent task results. For answers at any hour, run the [always-on agent bridge](adapters/agent-bridge/README.md) on a server or always-on PC: it answers messages, calls and callbacks from an OpenAI-compatible model (local or hosted) or a CLI agent such as `claude -p`. Schedules and run results appear when a connected agent reports them.
 
 ## Choose the components you need
 
@@ -49,6 +49,7 @@ Screenshots supplied by the project author; the Agents image has been edited to 
 | Android communications app | `android/app` | Android 8+ phone/tablet | Yes |
 | Relay and private SQLite store | `backend` | Your Linux server, PC or VPS | Yes |
 | Stdio MCP client bridge | `adapters/mcp-stdio` | Computer running your MCP client | Only for stdio clients |
+| Always-on agent bridge | `adapters/agent-bridge` | Server or always-on PC | Optional; answers without a desktop session |
 | Local GGUF runtime library | `android/local-model`, `native` | Developer builds | Optional; excluded from the normal app |
 | Private-network HTTPS | Tailscale Serve or your reverse proxy | Relay host | Yes for a real phone |
 
@@ -79,7 +80,7 @@ sudo tailscale serve --bg http://127.0.0.1:8793
 ```
 
 5. On the phone, open **Settings**, enter your HTTPS address and that keyword, then **Pair with my box**. Allow notifications; enable **Become available** for background calls/messages. Microphone permission is requested when answering a voice call.
-6. [Provision an agent and connect its MCP client](docs/MCP.md). Test `list_devices`, then make one intentional test call.
+6. [Provision an agent and connect its MCP client](docs/MCP.md). Test `list_devices`, then make one intentional test call. To have the phone answered around the clock, also set up the [always-on agent bridge](adapters/agent-bridge/README.md).
 
 The full guide covers Tailscale HTTPS prerequisites, service startup after reboot/logout, Windows/macOS foreground installation, client configuration, permissions and troubleshooting. Do not substitute Tailscale Funnel: Serve keeps this endpoint on your private network.
 
@@ -87,10 +88,10 @@ The full guide covers Tailscale HTTPS prerequisites, service startup after reboo
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e './backend[dev]' -e ./adapters/mcp-stdio build twine
-.venv/bin/python -m pytest backend/tests -q
-.venv/bin/ruff check --config backend/pyproject.toml backend adapters/mcp-stdio scripts
-.venv/bin/mypy --config-file backend/pyproject.toml backend/alphamobile adapters/mcp-stdio/alphamobile_mcp
+.venv/bin/python -m pip install -e './backend[dev]' -e ./adapters/mcp-stdio -e ./adapters/agent-bridge build twine
+.venv/bin/python -m pytest backend/tests adapters/agent-bridge/tests -q
+.venv/bin/ruff check --config backend/pyproject.toml backend adapters scripts
+.venv/bin/mypy --config-file backend/pyproject.toml backend/alphamobile adapters/mcp-stdio/alphamobile_mcp adapters/agent-bridge/alphamobile_agent
 python3 scripts/audit-public.py
 ```
 
@@ -98,7 +99,7 @@ Two release-feed tests require `ALPHAMOBILE_TEST_APK` pointing to a real signed 
 
 ## Boundaries
 
-The relay stores transcripts and results on your own computer; transport is encrypted, but this is not end-to-end encryption through the relay. Treat a relay as one trusted owner/team boundary. Availability uses an Android foreground service and consumes battery. Force-stopping, restrictive battery settings, loss of network access or a sleeping agent can stop delivery. Callbacks and task reporting require an active agent loop. Android sound/DND settings and full-screen-call permission control ringing presentation.
+The relay stores transcripts and results on your own computer; transport is encrypted, but this is not end-to-end encryption through the relay. Treat a relay as one trusted owner/team boundary. Availability uses an Android foreground service and consumes battery. Force-stopping, restrictive battery settings, loss of network access or a sleeping agent can stop delivery. Callbacks and task reporting require an active agent loop, such as the always-on bridge. Android sound/DND settings and full-screen-call permission control ringing presentation.
 
 The generic APK has no built-in server address or private certificate. HTTPS with a publicly trusted certificate, including Tailscale Serve, works without a custom build. If you use a private CA, build an endpoint-scoped trust configuration as described in [BUILD.md](docs/BUILD.md).
 

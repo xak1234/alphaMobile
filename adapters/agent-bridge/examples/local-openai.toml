@@ -1,0 +1,11 @@
+# Always-on local model: any OpenAI-compatible server
+# (llama.cpp llama-server, Ollama, LM Studio, vLLM, llama-swap, LiteLLM...).
+name = "Home assistant"
+connection = "~/.config/alphamobile/home-agent.connection.json"
+
+[text]
+type = "openai"
+base_url = "http://127.0.0.1:11434/v1"   # Ollama; llama-server is usually :8080/v1
+model = "llama3.2"
+max_tokens = 800
+timeout = 120

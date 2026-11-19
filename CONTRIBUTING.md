@@ -8,13 +8,14 @@ From the repository root, with Python 3.11+:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e './backend[dev]' -e ./adapters/mcp-stdio build twine
-.venv/bin/ruff check --config backend/pyproject.toml backend adapters/mcp-stdio scripts
-.venv/bin/mypy --config-file backend/pyproject.toml backend/alphamobile adapters/mcp-stdio/alphamobile_mcp
-.venv/bin/python -m pytest backend/tests -q
+.venv/bin/python -m pip install -e './backend[dev]' -e ./adapters/mcp-stdio -e ./adapters/agent-bridge build twine
+.venv/bin/ruff check --config backend/pyproject.toml backend adapters scripts
+.venv/bin/mypy --config-file backend/pyproject.toml backend/alphamobile adapters/mcp-stdio/alphamobile_mcp adapters/agent-bridge/alphamobile_agent
+.venv/bin/python -m pytest backend/tests adapters/agent-bridge/tests -q
 .venv/bin/python -m build backend
 .venv/bin/python -m build adapters/mcp-stdio
-.venv/bin/python -m twine check backend/dist/* adapters/mcp-stdio/dist/*
+.venv/bin/python -m build adapters/agent-bridge
+.venv/bin/python -m twine check backend/dist/* adapters/mcp-stdio/dist/* adapters/agent-bridge/dist/*
 python3 scripts/audit-public.py
 ```
 
